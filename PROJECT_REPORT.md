@@ -6,6 +6,52 @@ This project focuses on building a comprehensive analytics pipeline for analyzin
 
 ---
 
+## Business Objective
+
+### The Business Problem
+
+Ethiopian banking institutions face a critical challenge in understanding and responding to customer feedback about their mobile banking applications. With the rapid digitization of banking services and increasing competition in the fintech space, banks need to:
+
+1. **Monitor Customer Satisfaction in Real-Time**: Traditional methods of collecting customer feedback (surveys, focus groups) are slow, expensive, and often suffer from low response rates. Banks need immediate insights into how customers perceive their mobile apps.
+
+2. **Identify Pain Points Systematically**: Customer reviews on app stores contain valuable, unfiltered feedback about app performance, features, and user experience. However, manually analyzing thousands of reviews is time-consuming and impractical, leading to delayed responses to critical issues.
+
+3. **Make Data-Driven Product Decisions**: Product managers and development teams need quantitative and qualitative insights to prioritize feature development, bug fixes, and UX improvements based on actual customer needs rather than assumptions.
+
+4. **Competitive Intelligence**: Understanding how competitors' apps are perceived helps banks identify market gaps, benchmark performance, and develop competitive advantages.
+
+5. **Reduce Customer Churn**: Negative reviews and unresolved issues can lead to customer dissatisfaction and churn. Early identification of problems allows banks to address issues proactively before they escalate.
+
+### Business Value Proposition
+
+This analytics solution addresses these challenges by:
+
+- **Automating Review Analysis**: Transforms unstructured review data into structured, actionable insights without manual effort
+- **Enabling Proactive Issue Resolution**: Identifies critical issues (performance problems, login issues, transaction failures) before they become widespread complaints
+- **Supporting Strategic Decision-Making**: Provides quantitative metrics (sentiment scores, theme frequencies) to guide product roadmap and resource allocation
+- **Improving Customer Satisfaction**: Helps banks understand what customers love and hate, enabling targeted improvements that enhance user experience
+- **Reducing Analysis Time**: Cuts down review analysis time from weeks to hours, allowing faster response to customer concerns
+- **Enabling Competitive Benchmarking**: Provides side-by-side comparison of sentiment and themes across competing banks
+
+### Target Stakeholders
+
+- **Product Managers**: Need insights to prioritize features and improvements
+- **Customer Experience Teams**: Require understanding of customer sentiment and pain points
+- **Development Teams**: Need to identify technical issues and bugs mentioned in reviews
+- **Executive Leadership**: Require high-level metrics and trends for strategic decision-making
+- **Marketing Teams**: Can leverage positive sentiment and themes for promotional campaigns
+
+### Success Metrics
+
+The success of this project will be measured by:
+- **Actionability**: Ability to identify specific, addressable issues from review data
+- **Timeliness**: Reduction in time-to-insight from weeks to hours
+- **Coverage**: Analysis of 100% of available reviews (not just samples)
+- **Accuracy**: Reliable sentiment classification and theme identification
+- **Usability**: Easy-to-understand visualizations and reports for non-technical stakeholders
+
+---
+
 ## 1. Project Overview
 
 ### 1.1 Objective
@@ -168,6 +214,103 @@ All processed data is stored in `data/processed/`:
 4. **`sentiment_summary.csv`**: Aggregated sentiment statistics by bank and rating
 5. **`theme_summary.csv`**: Theme statistics with review counts and sample reviews
 6. **`keywords_per_bank.csv`**: Top TF-IDF keywords for each bank
+
+### 2.5 Parameter Choices and Configuration
+
+#### 2.5.1 Sentiment Analysis Parameters
+
+**Model Selection:**
+- **Primary Model**: `distilbert-base-uncased-finetuned-sst-2-english` (DistilBERT)
+  - **Rationale**: Fast and efficient while maintaining good accuracy
+  - **Fallback**: VADER sentiment analyzer (if transformers unavailable)
+  - **Alternative Models Considered**:
+    - `cardiffnlp/twitter-roberta-base-sentiment-latest` (better for social media)
+    - `nlptown/bert-base-multilingual-uncased-sentiment` (multilingual support)
+
+**Neutral Classification Thresholds:**
+- **DistilBERT `neutral_threshold`**: 0.6
+  - **Rationale**: If model confidence < 0.6, classify as neutral
+  - **Impact**: Higher values = more conservative (more neutrals), lower = more decisive
+  - **Tuning**: Balanced at 0.6 to capture ambiguous reviews without over-classifying
+
+- **VADER `vader_neutral_threshold`**: 0.05
+  - **Rationale**: Standard VADER recommendation for neutral zone
+  - **Logic**: If |compound_score| ≤ 0.05, classify as neutral
+  - **Range**: VADER compound scores range from -1 (negative) to +1 (positive)
+
+**Batch Processing:**
+- **Batch Size**: 32 reviews per batch
+  - **Rationale**: Balance between speed and memory usage
+  - **Tuning**: 16-64 range recommended depending on available RAM
+  - **Impact**: Higher = faster but more memory, lower = slower but less memory
+
+#### 2.5.2 Theme Extraction Parameters
+
+**TF-IDF Keyword Extraction:**
+- **`ngram_range`**: (1, 2) - Unigrams and bigrams
+  - **Rationale**: Captures meaningful phrases like "good app", "money transfer"
+  - **Trade-off**: More features = better context but slower processing
+  - **Alternative**: (1, 1) for only single words (faster but less context)
+
+- **`max_features`**: 500
+  - **Rationale**: Good balance for ~1000 reviews dataset
+  - **Impact**: Higher = more diverse keywords but slower, lower = faster but may miss terms
+  - **Scaling**: Adjust based on dataset size (500 for 1K reviews, 1000 for 10K+)
+
+- **`min_df`**: 2 (minimum document frequency)
+  - **Rationale**: Filter out typos and extremely rare terms
+  - **Impact**: Higher = only very common terms, lower = more diverse but may include noise
+  - **Tuning**: 2 ensures term appears in at least 2 reviews (noise reduction)
+
+- **`top_n`**: 15 keywords per bank
+  - **Rationale**: Sufficient for identifying key themes without overwhelming output
+  - **Usage**: Top 15 TF-IDF scored keywords extracted per bank
+
+**Theme Assignment:**
+- **Method**: Rule-based keyword matching with spaCy lemmatization
+- **Logic**: 
+  1. Tokenize and lemmatize review text
+  2. Check for theme keywords (case-insensitive)
+  3. Assign all matching themes (reviews can have multiple themes)
+  4. Default to "General Feedback" if no keywords match
+- **Keyword Lists**: Defined in `config.py` under `NLP_SETTINGS["theme_keywords"]`
+  - 7 themes with 6-7 keywords each
+  - Keywords chosen based on domain knowledge and common review patterns
+
+#### 2.5.3 Scraper Parameters
+
+- **`min_reviews_per_bank`**: 400
+  - **Rationale**: Target for statistical significance (≥400 per bank = ≥1,200 total)
+  - **KPI Requirement**: ≥1,200 total reviews with <5% missing data
+  - **Current Status**: 1,151 reviews collected (96% of target)
+
+- **`batch_size`**: 200 reviews per API call
+  - **Rationale**: Balance between API efficiency and memory usage
+  - **Impact**: Higher = fewer API calls but more memory
+
+- **`lang`**: "en" (English)
+  - **Rationale**: Focus on English reviews for consistent analysis
+  - **Filtering**: Non-English reviews (e.g., Amharic) filtered during preprocessing
+
+- **`country`**: "et" (Ethiopia)
+  - **Rationale**: Target Ethiopian banking apps specifically
+
+#### 2.5.4 Preprocessing Parameters
+
+- **Date Format**: YYYY-MM-DD (ISO 8601)
+  - **Rationale**: Standardized format for temporal analysis
+  - **Validation**: Invalid dates are dropped
+
+- **Rating Range**: 1-5 (integers only)
+  - **Rationale**: Google Play Store standard rating system
+  - **Validation**: Ratings outside this range are dropped
+
+- **Language Filtering**: Amharic/Ethiopic script detection
+  - **Method**: Unicode regex pattern `[\u1200-\u137F]+`
+  - **Rationale**: Focus on English reviews for consistent NLP processing
+  - **Impact**: Non-English reviews filtered out during preprocessing
+
+**All parameters are configurable via `config.py` for easy adaptation to different use cases.**
 
 ---
 

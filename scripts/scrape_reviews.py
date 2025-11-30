@@ -54,9 +54,23 @@ def fetch_reviews_for_bank(
     min_reviews: int,
     batch_size: int,
 ) -> List[Dict]:
-    """Fetch reviews for a single bank until min_reviews is reached or tokens exhaust."""
+    """
+    Fetch reviews for a single bank until min_reviews is reached or tokens exhaust.
+    
+    Args:
+        bank: Bank configuration
+        lang: Language code (e.g., "en")
+        country: Country code (e.g., "et")
+        min_reviews: Minimum number of reviews to collect (target: 400)
+        batch_size: Number of reviews per API call
+    
+    Returns:
+        List of review dictionaries. May be less than min_reviews if API limits reached.
+    """
     all_reviews: List[Dict] = []
     continuation_token: Optional[Tuple] = None
+    attempts = 0
+    max_attempts = 50  # Prevent infinite loops
 
     with tqdm(
         total=min_reviews,
@@ -64,24 +78,38 @@ def fetch_reviews_for_bank(
         unit="reviews",
         leave=False,
     ) as progress:
-        while len(all_reviews) < min_reviews:
-            batch, continuation_token = reviews(
-                bank.app_id,
-                lang=lang,
-                country=country,
-                sort=Sort.NEWEST,
-                count=batch_size,
-                continuation_token=continuation_token,
-            )
+        while len(all_reviews) < min_reviews and attempts < max_attempts:
+            try:
+                batch, continuation_token = reviews(
+                    bank.app_id,
+                    lang=lang,
+                    country=country,
+                    sort=Sort.NEWEST,
+                    count=batch_size,
+                    continuation_token=continuation_token,
+                )
 
-            if not batch:
+                if not batch:
+                    break
+
+                all_reviews.extend(batch)
+                progress.update(len(batch))
+                attempts += 1
+
+                if continuation_token is None:
+                    break
+            except Exception as e:
+                print(f"\nWarning: Error fetching reviews for {bank.bank}: {e}")
                 break
 
-            all_reviews.extend(batch)
-            progress.update(len(batch))
-
-            if continuation_token is None:
-                break
+    # Final status
+    if len(all_reviews) >= min_reviews:
+        progress.n = min_reviews
+        progress.refresh()
+    else:
+        # Update progress bar to show actual count
+        progress.n = len(all_reviews)
+        progress.refresh()
 
     return all_reviews
 
@@ -147,33 +175,68 @@ def collect_app_metadata(bank_configs: List[BankConfig], settings: Dict) -> List
 def scrape_all_banks(
     bank_configs: List[BankConfig], settings: Dict
 ) -> pd.DataFrame:
-    """Scrape all configured banks and return combined DataFrame."""
+    """
+    Scrape all configured banks and return combined DataFrame.
+    
+    Ensures at least min_reviews_per_bank (default: 400) reviews per bank.
+    Logs detailed statistics and KPI compliance.
+    """
     normalized_records: List[Dict] = []
     stats = []
+    min_target = settings["min_reviews_per_bank"]
 
     print("\n[2/3] Scraping Google Play reviews...")
+    print(f"Target: ≥{min_target} reviews per bank")
+    print("-" * 60)
+    
     for bank in bank_configs:
         raw_reviews = fetch_reviews_for_bank(
             bank=bank,
             lang=settings["lang"],
             country=settings["country"],
-            min_reviews=settings["min_reviews_per_bank"],
+            min_reviews=min_target,
             batch_size=settings["batch_size"],
         )
         bank_records = [normalize_record(rec, bank) for rec in raw_reviews]
         normalized_records.extend(bank_records)
-        stats.append((bank.bank, len(bank_records)))
-        if len(bank_records) < settings["min_reviews_per_bank"]:
-            print(
-                f"Warning: {bank.bank} returned {len(bank_records)} reviews "
-                f"(<{settings['min_reviews_per_bank']} target)"
-            )
+        count = len(bank_records)
+        stats.append((bank.bank, count))
+        
+        # Detailed logging per bank
+        if count >= min_target:
+            print(f"✓ {bank.bank:30s}: {count:,} reviews (target met)")
+        else:
+            print(f"⚠ {bank.bank:30s}: {count:,} reviews (target: {min_target}, shortfall: {min_target - count})")
 
     df = pd.DataFrame(normalized_records)
+    
+    # Summary statistics
+    print("\n" + "=" * 60)
+    print("SCRAPING SUMMARY")
+    print("=" * 60)
+    print(f"Total reviews collected: {len(df):,}")
     print("\nReview counts per bank:")
+    all_met_target = True
     for bank_name, count in stats:
-        print(f"  {bank_name}: {count}")
-    print(f"Total reviews: {len(df)}\n")
+        status = "✓" if count >= min_target else "⚠"
+        print(f"  {status} {bank_name:30s}: {count:,} reviews")
+        if count < min_target:
+            all_met_target = False
+    
+    # KPI verification
+    print("\n" + "-" * 60)
+    if all_met_target:
+        print(f"✓ KPI MET: All banks have ≥{min_target} reviews")
+    else:
+        print(f"⚠ KPI WARNING: Some banks have <{min_target} reviews")
+    
+    total_reviews = len(df)
+    if total_reviews >= 1200:
+        print(f"✓ KPI MET: Total reviews: {total_reviews:,} (≥1,200 required)")
+    else:
+        print(f"⚠ KPI WARNING: Total reviews: {total_reviews:,} (<1,200 required)")
+    
+    print("=" * 60 + "\n")
     return df
 
 

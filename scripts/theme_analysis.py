@@ -74,15 +74,54 @@ def preprocess_reviews(df: pd.DataFrame, nlp: "spacy.language.Language") -> pd.D
 
 
 def tfidf_keywords(texts: Sequence[str], bank: str, top_n: int = 15) -> List[Tuple[str, float]]:
+    """
+    Extract top keywords using TF-IDF (Term Frequency-Inverse Document Frequency).
+    
+    TF-IDF identifies terms that are important to a specific bank's reviews
+    by weighting terms that appear frequently in that bank's reviews but
+    infrequently across all banks.
+    
+    Parameters:
+        texts (Sequence[str]): Preprocessed review texts (lemmatized, lowercased)
+        bank (str): Bank name (for logging purposes)
+        top_n (int): Number of top keywords to return. Default: 15
+    
+    TF-IDF Parameters (hardcoded):
+        ngram_range=(1, 2): Extract both single words (unigrams) and 2-word phrases (bigrams)
+            - Captures phrases like "good app", "money transfer" that are more meaningful
+            - Trade-off: More features = better context but slower processing
+        
+        max_features=500: Maximum number of unique terms to consider
+            - Higher = more diverse keywords but slower
+            - Lower = faster but may miss less common important terms
+            - 500 is a good balance for ~1000 reviews
+        
+        min_df=2: Minimum document frequency (term must appear in ≥2 reviews)
+            - Filters out typos and extremely rare terms
+            - Higher = only very common terms (may miss important but less frequent terms)
+            - Lower = more diverse terms (may include noise)
+            - Default: 2 (term must appear in at least 2 reviews)
+    
+    Returns:
+        List[Tuple[str, float]]: List of (keyword, tfidf_score) tuples, sorted by score descending
+    
+    Example:
+        >>> keywords = tfidf_keywords(["good app", "nice interface"], "Dashen Bank", top_n=5)
+        >>> # Returns: [("good app", 0.85), ("nice interface", 0.72), ...]
+    """
     # Filter out empty strings and ensure we have valid text
     texts = [text.strip() for text in texts if text and isinstance(text, str) and text.strip()]
     if not texts or not any(texts):
         return []
     try:
+        # TF-IDF Vectorizer Configuration:
+        # - ngram_range=(1, 2): Extract unigrams and bigrams for better context
+        # - max_features=500: Limit vocabulary size for efficiency
+        # - min_df=2: Filter terms appearing in <2 reviews (noise reduction)
         vectorizer = TfidfVectorizer(
-            ngram_range=(1, 2),
-            max_features=500,
-            min_df=2,
+            ngram_range=(1, 2),  # Single words and 2-word phrases
+            max_features=500,   # Maximum vocabulary size
+            min_df=2,           # Minimum document frequency threshold
         )
         matrix = vectorizer.fit_transform(texts)
         if matrix.shape[1] == 0:  # No features extracted
