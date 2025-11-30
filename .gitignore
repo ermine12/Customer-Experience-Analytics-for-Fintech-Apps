@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+.idea/
+.vscode/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.log
+data/raw/*.json
+data/raw/*.csv
+data/processed/*.csv
+data/raw/*.parquet
+data/processed/*.parquet
+.env
+
