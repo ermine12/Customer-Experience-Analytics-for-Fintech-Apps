@@ -332,9 +332,224 @@ python -m spacy download en_core_web_sm
 - Bank of Abyssinia – `com.boa.boaMobileBanking`
 - Commercial Bank of Ethiopia – `com.combanketh.mobilebanking`
 
+## Task 3: PostgreSQL Database
+
+### Database Setup
+
+**Choose your setup method:**
+
+#### Option A: Docker (Recommended - No Installation Needed!) 🐳
+
+**Best for:** Quick setup, no system installation, easy cleanup
+
+1. **Install Docker Desktop:**
+   - Download from: https://www.docker.com/products/docker-desktop/
+   - Install and start Docker Desktop
+
+2. **Start PostgreSQL:**
+   ```powershell
+   docker-compose up -d
+   ```
+   PostgreSQL is now running in a container!
+
+3. **Set password in `.env` file:**
+   - Edit `.env` and set `POSTGRES_PASSWORD=postgres` (or match docker-compose.yml)
+
+4. **See `DOCKER_SETUP.md` for detailed Docker instructions.**
+
+#### Option B: Local PostgreSQL Installation
+
+1. **Install PostgreSQL** (if not already installed)
+   - Download from: https://www.postgresql.org/download/
+   - Windows: Use the installer and remember your postgres user password
+
+2. **Set Database Password**
+   ```powershell
+   # Option 1: Environment variable (recommended)
+   set POSTGRES_PASSWORD=your_password
+   
+   # Option 2: Edit database_config.py
+   # Uncomment and set: DB_CONFIG['password'] = 'your_password'
+   ```
+
+3. **Create Database and Tables**
+   ```powershell
+   python scripts/setup_database.py
+   ```
+   This will:
+   - Create the `bank_reviews` database
+   - Create all required tables with proper schema
+   - Set up indexes and foreign key relationships
+   - Verify table creation
+
+4. **Load Data into Database**
+   ```powershell
+   python scripts/load_data.py
+   ```
+   This will:
+   - Insert bank information from config
+   - Load reviews from processed CSV files
+   - Insert reviews with proper foreign key relationships
+   - Handle duplicates automatically
+   - Verify data integrity with SQL queries
+   - Display loading statistics
+
+### Database Schema
+
+The `bank_reviews` database contains the following tables:
+
+#### 1. `banks` Table
+Stores information about the banks being analyzed.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `bank_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `bank_name` | VARCHAR(100) NOT NULL UNIQUE | Full bank name (e.g., "Dashen Bank") |
+| `app_name` | VARCHAR(200) | Name of the mobile banking app |
+| `bank_code` | VARCHAR(50) | Short identifier (e.g., "dashen") |
+| `app_id` | VARCHAR(200) | Google Play Store app package ID |
+| `created_at` | TIMESTAMP | Timestamp when record was created |
+
+#### 2. `reviews` Table
+Stores the scraped and processed review data.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `review_id` | VARCHAR(200) PRIMARY KEY | Unique identifier from source |
+| `bank_id` | INTEGER NOT NULL | Foreign key to `banks.bank_id` |
+| `review_text` | TEXT NOT NULL | Full text content of the review |
+| `rating` | INTEGER NOT NULL | Star rating (1-5, CHECK constraint) |
+| `review_date` | DATE NOT NULL | Date when review was posted |
+| `review_year` | INTEGER | Extracted year from `review_date` |
+| `review_month` | INTEGER | Extracted month from `review_date` |
+| `review_length` | INTEGER | Character count of review text |
+| `sentiment_label` | VARCHAR(20) | Sentiment: "positive", "neutral", or "negative" |
+| `sentiment_score` | DECIMAL(5, 3) | Sentiment score (0.0 to 1.0) |
+| `sentiment_source` | VARCHAR(50) | Source of sentiment (e.g., "distilbert", "vader") |
+| `source` | VARCHAR(50) | Data source (default: "google_play") |
+| `user_name` | VARCHAR(200) | Name of the reviewer |
+| `thumbs_up` | INTEGER | Number of helpful votes (default: 0) |
+| `scraped_at` | TIMESTAMP | When review was scraped |
+| `created_at` | TIMESTAMP | When record was created |
+| `updated_at` | TIMESTAMP | When record was last updated |
+
+**Foreign Key:** `bank_id` → `banks.bank_id` (ON DELETE CASCADE)
+
+**Indexes:**
+- `idx_reviews_bank_id` on `bank_id`
+- `idx_reviews_rating` on `rating`
+- `idx_reviews_date` on `review_date`
+- `idx_reviews_sentiment` on `sentiment_label`
+- `idx_reviews_year` on `review_year`
+- `idx_reviews_month` on `review_month`
+
+#### 3. `themes` Table
+Stores theme assignments for reviews (many-to-many relationship).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `theme_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `review_id` | VARCHAR(200) NOT NULL | Foreign key to `reviews.review_id` |
+| `theme_name` | VARCHAR(100) NOT NULL | Theme name (e.g., "Performance & Reliability") |
+| `created_at` | TIMESTAMP | When record was created |
+
+**Foreign Key:** `review_id` → `reviews.review_id` (ON DELETE CASCADE)
+
+**Unique Constraint:** (`review_id`, `theme_name`) - prevents duplicate theme assignments
+
+#### 4. `keywords` Table
+Stores keywords extracted from reviews via TF-IDF.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `keyword_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `review_id` | VARCHAR(200) NOT NULL | Foreign key to `reviews.review_id` |
+| `keyword` | VARCHAR(200) NOT NULL | Extracted keyword or phrase |
+| `created_at` | TIMESTAMP | When record was created |
+
+**Foreign Key:** `review_id` → `reviews.review_id` (ON DELETE CASCADE)
+
+**Unique Constraint:** (`review_id`, `keyword`) - prevents duplicate keywords
+
+#### 5. `sentiment_summary` Table
+Stores aggregated sentiment statistics by bank and rating.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `summary_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `bank_id` | INTEGER NOT NULL | Foreign key to `banks.bank_id` |
+| `rating` | INTEGER NOT NULL | Star rating (1-5, CHECK constraint) |
+| `review_count` | INTEGER NOT NULL | Number of reviews in this category |
+| `positive_pct` | DECIMAL(5, 2) | Percentage of positive reviews |
+| `neutral_pct` | DECIMAL(5, 2) | Percentage of neutral reviews |
+| `negative_pct` | DECIMAL(5, 2) | Percentage of negative reviews |
+| `mean_score` | DECIMAL(5, 3) | Average sentiment score |
+| `created_at` | TIMESTAMP | When record was created |
+| `updated_at` | TIMESTAMP | When record was last updated |
+
+**Foreign Key:** `bank_id` → `banks.bank_id` (ON DELETE CASCADE)
+
+**Unique Constraint:** (`bank_id`, `rating`) - one summary per bank-rating combination
+
+#### 6. `theme_summary` Table
+Stores aggregated theme statistics by bank.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `theme_summary_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `bank_id` | INTEGER NOT NULL | Foreign key to `banks.bank_id` |
+| `theme_name` | VARCHAR(100) NOT NULL | Name of the theme |
+| `review_count` | INTEGER NOT NULL | Number of reviews with this theme |
+| `avg_rating` | DECIMAL(3, 2) | Average rating for reviews with this theme |
+| `sample_review` | TEXT | Example review text for this theme |
+| `created_at` | TIMESTAMP | When record was created |
+| `updated_at` | TIMESTAMP | When record was last updated |
+
+**Foreign Key:** `bank_id` → `banks.bank_id` (ON DELETE CASCADE)
+
+**Unique Constraint:** (`bank_id`, `theme_name`) - one summary per bank-theme combination
+
+### SQL Verification Queries
+
+Run verification queries to check data integrity:
+
+```powershell
+# Using psql command line
+psql -U postgres -d bank_reviews -f scripts/verify_data.sql
+
+# Or connect via pgAdmin and run queries from scripts/verify_data.sql
+```
+
+The verification script includes queries for:
+- Total review counts
+- Reviews per bank
+- Average ratings per bank
+- Rating distribution
+- Sentiment distribution
+- Temporal analysis (reviews by year/month)
+- Data quality checks
+- Foreign key integrity
+
+### Schema Files
+
+- **`database_schema.sql`**: Complete SQL schema definition (can be used to recreate database)
+- **`scripts/verify_data.sql`**: SQL queries for data verification and reporting
+
+### Database Connection
+
+Connection settings are configured in `database_config.py`:
+- **Host**: localhost (default)
+- **Port**: 5432 (default)
+- **Database**: bank_reviews
+- **User**: postgres (default)
+- **Password**: Set via environment variable or in config file
+
 ## KPIs
 - ≥1,200 reviews total with <5% missing records post-cleaning.
 - Clean CSV with normalized dates (YYYY-MM-DD), metadata columns, and English-only text.
 - Sentiment labels + scores for ≥90% of reviews, with summaries per bank/rating.
 - ≥3 recurring themes per bank captured via keyword-driven grouping.
+- **PostgreSQL database with >1,000 review entries** (Task 3 KPI).
+- **Working database connection + insert script** (Task 3 KPI).
+- **SQL dump/schema file committed to repository** (Task 3 KPI).
 

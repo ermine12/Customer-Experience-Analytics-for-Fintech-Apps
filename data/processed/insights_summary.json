@@ -1,0 +1,329 @@
+{
+  "drivers": {
+    "Dashen Bank": [
+      {
+        "theme": "User Experience",
+        "positive_pct": 91.7,
+        "avg_rating": 4.38,
+        "review_count": 24,
+        "evidence": [
+          "The Dashen Super App is very impressive. It is fast, easy to use, and provides smooth access to all essential banking services. Money transfer, bill payment, balance check, and other features work efficiently without issues. The design is clean and user-friendly. Great step forward in digital banking — keep up the good work, Dashen Bank!..",
+          "All in One Super App with smooth navigation, transaction and lifestyle services"
+        ]
+      },
+      {
+        "theme": "General Feedback",
+        "positive_pct": 70.0,
+        "avg_rating": 4.25,
+        "review_count": 290,
+        "evidence": [
+          "its fast and easy to communicate to the app and its available all area keep it up.i will make Happy for this application thank you dashen bank for your effort,commitment and dedication. i appricated your work.",
+          "very easy app"
+        ]
+      }
+    ],
+    "Bank of Abyssinia": [],
+    "Commercial Bank of Ethiopia": [
+      {
+        "theme": "General Feedback",
+        "positive_pct": 64.7,
+        "avg_rating": 4.45,
+        "review_count": 306,
+        "evidence": [
+          "the most advanced app. but how to stay safe?",
+          "Good application"
+        ]
+      }
+    ]
+  },
+  "pain_points": {
+    "Dashen Bank": [
+      {
+        "theme": "Performance & Reliability",
+        "negative_pct": 58.3,
+        "avg_rating": 1.88,
+        "review_count": 24,
+        "evidence": [
+          "it's a really slow app, I'm not sure what the issue is. Even other bank transfers are not working",
+          "This so-called “Super App” is a complete disappointment. It’s confusing, slow, and full of glitches honestly, it feels like it was designed to test people’s patience, not to help them bank. Calling it “super” is a joke; it’s one of the most useless apps I’ve ever used."
+        ]
+      },
+      {
+        "theme": "Features & Functionality|Performance & Reliability",
+        "negative_pct": 43.1,
+        "avg_rating": 2.63,
+        "review_count": 51,
+        "evidence": [
+          "bill payment options are limited in this app please add ethio telecom bill electric bill etc.. instead of adding nonsense in banking app",
+          "it's a really slow app, I'm not sure what the issue is. Even other bank transfers are not working"
+        ]
+      },
+      {
+        "theme": "Performance & Reliability|Transactions & Payments",
+        "negative_pct": 42.0,
+        "avg_rating": 2.72,
+        "review_count": 50,
+        "evidence": [
+          "bill payment options are limited in this app please add ethio telecom bill electric bill etc.. instead of adding nonsense in banking app",
+          "it's a really slow app, I'm not sure what the issue is. Even other bank transfers are not working"
+        ]
+      },
+      {
+        "theme": "Customer Support|Performance & Reliability",
+        "negative_pct": 38.5,
+        "avg_rating": 2.59,
+        "review_count": 39,
+        "evidence": [
+          "it's a really slow app, I'm not sure what the issue is. Even other bank transfers are not working",
+          "This so-called “Super App” is a complete disappointment. It’s confusing, slow, and full of glitches honestly, it feels like it was designed to test people’s patience, not to help them bank. Calling it “super” is a joke; it’s one of the most useless apps I’ve ever used."
+        ]
+      },
+      {
+        "theme": "Features & Functionality|Performance & Reliability|Transactions & Payments",
+        "negative_pct": 37.7,
+        "avg_rating": 2.88,
+        "review_count": 69,
+        "evidence": [
+          "bill payment options are limited in this app please add ethio telecom bill electric bill etc.. instead of adding nonsense in banking app",
+          "it's a really slow app, I'm not sure what the issue is. Even other bank transfers are not working"
+        ]
+      }
+    ],
+    "Bank of Abyssinia": [
+      {
+        "theme": "Performance & Reliability",
+        "negative_pct": 51.6,
+        "avg_rating": 1.32,
+        "review_count": 31,
+        "evidence": [
+          "not user friendly at all it requires a huge connectivity and also lags many times 😑😑😑",
+          "the lag is unbelievable when you need it the most this suks"
+        ]
+      },
+      {
+        "theme": "Features & Functionality|Performance & Reliability",
+        "negative_pct": 50.0,
+        "avg_rating": 1.68,
+        "review_count": 50,
+        "evidence": [
+          "not user friendly at all it requires a huge connectivity and also lags many times 😑😑😑",
+          "It keeps notifying me to disable developer options and quiet while I'm not enabled. always bring another type of problem with new updates."
+        ]
+      },
+      {
+        "theme": "Performance & Reliability|User Experience",
+        "negative_pct": 48.5,
+        "avg_rating": 1.39,
+        "review_count": 33,
+        "evidence": [
+          "not user friendly at all it requires a huge connectivity and also lags many times 😑😑😑",
+          "the lag is unbelievable when you need it the most this suks"
+        ]
+      },
+      {
+        "theme": "Access & Login|Features & Functionality|Performance & Reliability",
+        "negative_pct": 45.9,
+        "avg_rating": 1.77,
+        "review_count": 61,
+        "evidence": [
+          "not user friendly at all it requires a huge connectivity and also lags many times 😑😑😑",
+          "It keeps notifying me to disable developer options and quiet while I'm not enabled. always bring another type of problem with new updates."
+        ]
+      },
+      {
+        "theme": "Features & Functionality",
+        "negative_pct": 44.8,
+        "avg_rating": 1.97,
+        "review_count": 29,
+        "evidence": [
+          "It keeps notifying me to disable developer options and quiet while I'm not enabled. always bring another type of problem with new updates.",
+          "from the last week updates the app is not working Please check the problems"
+        ]
+      }
+    ],
+    "Commercial Bank of Ethiopia": [
+      {
+        "theme": "Access & Login",
+        "negative_pct": 38.5,
+        "avg_rating": 2.46,
+        "review_count": 13,
+        "evidence": [
+          "Seriously, what’s going on with this app? The \"Pay to Beneficiary\" option is completely disabled for Android users, yet iOS users get full access without restrictions. Why are Android users being treated like second class customers? It’s the same app, the same service, but clearly not the same experience. This kind of platform bias is unacceptable, either give everyone the same features or be transparent about why you’re limiting functionality. Right now, it just feels unfair and frustrating.",
+          "lately I am facing a problem with the app ,and the problem is when log in and inter my pin it doesn't work at all and says 'can't sync' why does it say that I was working fine a few day ago and also it says when I enter my pin 'change your pin to 6 digit pin and it doesn't allow me to change it please solve what is the problem with the app ?"
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "Dashen Bank": {
+      "total_reviews": 385,
+      "avg_rating": 3.95,
+      "positive_pct": 66.5,
+      "negative_pct": 13.5,
+      "rating_distribution": {
+        "5": 252,
+        "1": 72,
+        "4": 23,
+        "3": 21,
+        "2": 17
+      },
+      "top_themes": {
+        "General Feedback": 290,
+        "Features & Functionality": 15,
+        "Performance & Reliability": 13,
+        "User Experience": 11,
+        "Transactions & Payments": 10
+      }
+    },
+    "Bank of Abyssinia": {
+      "total_reviews": 384,
+      "avg_rating": 3.41,
+      "positive_pct": 51.0,
+      "negative_pct": 19.8,
+      "rating_distribution": {
+        "5": 200,
+        "1": 125,
+        "4": 23,
+        "3": 22,
+        "2": 14
+      },
+      "top_themes": {
+        "General Feedback": 303,
+        "Performance & Reliability": 15,
+        "Features & Functionality": 14,
+        "Transactions & Payments": 11,
+        "Access & Login": 8
+      }
+    },
+    "Commercial Bank of Ethiopia": {
+      "total_reviews": 382,
+      "avg_rating": 4.15,
+      "positive_pct": 61.3,
+      "negative_pct": 7.9,
+      "rating_distribution": {
+        "5": 257,
+        "1": 52,
+        "4": 40,
+        "3": 22,
+        "2": 11
+      },
+      "top_themes": {
+        "General Feedback": 306,
+        "Features & Functionality": 19,
+        "Transactions & Payments": 17,
+        "Customer Support": 10,
+        "Features & Functionality|Transactions & Payments": 8
+      }
+    }
+  },
+  "recommendations": {
+    "Dashen Bank": [
+      {
+        "priority": "HIGH",
+        "category": "Technical",
+        "recommendation": "Improve app stability and performance",
+        "rationale": "58.3% of reviews mention Performance & Reliability issues with avg rating 1.88",
+        "actions": [
+          "Conduct comprehensive performance testing",
+          "Optimize app startup time and response speed",
+          "Fix reported crashes and freezing issues",
+          "Implement better error handling and recovery"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "category": "General",
+        "recommendation": "Address Features & Functionality|Performance & Reliability concerns",
+        "rationale": "43.1% of reviews mention Features & Functionality|Performance & Reliability issues",
+        "actions": [
+          "Analyze specific complaints in detail",
+          "Prioritize most common issues",
+          "Develop targeted solutions"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "category": "General",
+        "recommendation": "Address Performance & Reliability|Transactions & Payments concerns",
+        "rationale": "42.0% of reviews mention Performance & Reliability|Transactions & Payments issues",
+        "actions": [
+          "Analyze specific complaints in detail",
+          "Prioritize most common issues",
+          "Develop targeted solutions"
+        ]
+      }
+    ],
+    "Bank of Abyssinia": [
+      {
+        "priority": "HIGH",
+        "category": "Technical",
+        "recommendation": "Improve app stability and performance",
+        "rationale": "51.6% of reviews mention Performance & Reliability issues with avg rating 1.32",
+        "actions": [
+          "Conduct comprehensive performance testing",
+          "Optimize app startup time and response speed",
+          "Fix reported crashes and freezing issues",
+          "Implement better error handling and recovery"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "category": "General",
+        "recommendation": "Address Features & Functionality|Performance & Reliability concerns",
+        "rationale": "50.0% of reviews mention Features & Functionality|Performance & Reliability issues",
+        "actions": [
+          "Analyze specific complaints in detail",
+          "Prioritize most common issues",
+          "Develop targeted solutions"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "category": "General",
+        "recommendation": "Address Performance & Reliability|User Experience concerns",
+        "rationale": "48.5% of reviews mention Performance & Reliability|User Experience issues",
+        "actions": [
+          "Analyze specific complaints in detail",
+          "Prioritize most common issues",
+          "Develop targeted solutions"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "category": "Competitive",
+        "recommendation": "Learn from Dashen Bank: Improve User Experience",
+        "rationale": "Dashen Bank has 91.7% positive sentiment for User Experience",
+        "actions": [
+          "Study Dashen Bank's approach to User Experience",
+          "Adapt best practices to your app",
+          "Conduct user research on this aspect"
+        ]
+      },
+      {
+        "priority": "MEDIUM",
+        "category": "Competitive",
+        "recommendation": "Learn from Dashen Bank: Improve General Feedback",
+        "rationale": "Dashen Bank has 70.0% positive sentiment for General Feedback",
+        "actions": [
+          "Study Dashen Bank's approach to General Feedback",
+          "Adapt best practices to your app",
+          "Conduct user research on this aspect"
+        ]
+      }
+    ],
+    "Commercial Bank of Ethiopia": [
+      {
+        "priority": "HIGH",
+        "category": "Security & UX",
+        "recommendation": "Streamline login and authentication process",
+        "rationale": "38.5% of reviews mention Access & Login issues",
+        "actions": [
+          "Simplify login flow (reduce steps)",
+          "Improve biometric authentication reliability",
+          "Fix OTP delivery issues",
+          "Add \"Remember me\" option for trusted devices"
+        ]
+      }
+    ]
+  }
+}
